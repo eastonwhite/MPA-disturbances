@@ -1,0 +1,11 @@
+.DS_Store
+.Rapp.history
+.Rhistory
+Literature/*
+old_drafts/*
+model_diagram/*
+preprint/*
+bc_code/*
+old_junk_code/*
+old_n_patch_code/*
+planning_units_20km/*

@@ -1,0 +1,388 @@
+---
+editor_options:
+  chunk_output_type: console
+fontsize: 12pt
+geometry: margin=1in
+header-includes: \usepackage{float} \usepackage{lineno} \renewcommand{\thepage}{S\arabic{page}}
+  \renewcommand{\thesection}{Appendix S\arabic{section}} \renewcommand{\thetable}{S\arabic{table}}
+  \renewcommand{\thefigure}{S\arabic{figure}}
+  \usepackage{amsmath}
+  \renewcommand{\theequation}{S\arabic{equation}} \floatplacement{figure}{H} \renewcommand*\oldstylenums[1]{\textosf{#1}}
+  \usepackage{tocloft} \addtolength{\cftsecnumwidth}{70pt} \setcounter{tocdepth}{1}
+  \usepackage[round]{natbib}  \bibpunct[:]{(}{)}{,}{a}{}{;}
+output:
+  pdf_document:
+    fig_caption: yes
+    keep_tex: yes
+    number_sections: yes
+  word_document: default
+---
+
+2020
+\vspace{1cm}
+
+\begin{centering}
+ \textbf{Supplementary Material: Catastrophes, connectivity, and Allee effects in the design of marine reserve networks}
+ 
+ \vspace{2 mm}
+ 
+Easton R. White,$^{1,2\ast}$ Marissa L. Baskett,$^{2,3}$, Alan Hastings$^{2,3,4}$
+
+\normalsize{$^{1}$Department of Biology, University of Vermont, Burlington, VT, USA \\$^{2}$Center for Population Biology, University of California, Davis, CA, USA, \\
+$^{3}$Department of Environmental Science and Policy, University of California, Davis, CA, USA \\
+$^{4}$Santa Fe Institute, Sante Fe, NM, USA}
+
+\normalsize{$^\ast$To whom correspondence should be addressed: E-mail:  eastonrwhite@gmail.com}
+
+
+\vspace{2 mm}
+
+\end{centering}
+
+\vspace{2 mm}
+
+\tableofcontents
+
+\vspace{1cm}
+
+Data and code for all the figures and tables can be found at (https://github.com/eastonwhite/MPA-disturbances). All the analyses were run in R.
+
+
+\clearpage
+
+# $n$-patch model description
+
+
+To extend the model described in the main manuscript to an $n$-patch scenario, we use the Beverton-Holt structure within each patch and model spatially-explicit dispersal (i.e.\ resulting connectivity between patches) and disturbances. We focus on a coastline system (a simple one-dimensional landscape) where $d_{ij}$ is the distance between patches $i$ and $j$. We use geometric decay for the dispersal kernel, with a dispersal shape parameter $\delta$, where increasing $\delta$ decreases dispersal. The probability of dispersal is then
+
+\begin{equation}
+P(\mbox{dispersal from patch i to patch j}) = \text{Geometric}(\delta,d_{ij}).
+\end{equation}
+
+
+
+For disturbances, we model the probability of disturbance, $M_i$, in each patch as a binomial process with probability $p_i$: 
+\begin{equation}
+M_i(t)  \sim \text{Binomial}(1, p_i).
+\end{equation}
+The spatial extent of the disturbance is a stochastic process giving the disturbance size ($x$), which affects patches near the disturbance. If a disturbance in patch $i$ is larger than the distance between patches $i$ and $j$, $d_{ij}$, then patch $j$ will also be affected by the disturbance:
+\begin{equation}
+P(\mbox{disturbance in patch j } | \mbox{ disturbance in patch i}) =
+\begin{cases}
+1       & \quad \text{if } d_{ij} < x\\
+0  & \quad \text{if } \text{ otherwise}.
+\end{cases}
+\end{equation}
+
+
+
+<!--
+\begin{equation}
+P(\mbox{disturbance of size x})  \sim \text{Exponential}(-\lambda x)
+\end{equation}
+-->
+
+
+
+
+With this $n$-patch model, we can relax the assumption of a "scorched earth" between patches by setting the fishing rate in non-reserves to be $F<1$. This allows us to study the effect of fishing pressure outside reserves on the effectiveness of the marine reserve network.
+
+<!--
+\section{Growth functions}
+
+```{r,echo=F,eval=F,cache=T,error=F,message=F,warning=F,fig.cap="Growth functions for population size from year t to year t+1. Each panel represents a different combination of the intrinsic rate of increase (r) and the Allee paramter ($\\omega$). This is for the two-patch model.\\label{fig:growth_functions}"}
+
+
+plot_reproductive_function = function(r,omega,K){
+
+curve((r*x^omega)/(1 + (x^omega)/K) ,from=0,to=2,ylab='N(t+1)',xlab='N(t)',
+      ylim=c(0,4),xlim=c(0,4),las=1)
+#curve(-1+(r*x^omega)/(1 + (x^omega)/K)/x ,from=-3,to=2,ylab='Growth rate',xlab='N(t)',
+ #    ylim=c(-1,1),xlim=c(0,2),las=1)
+#abline(h=0)
+abline(coef = c(0,1),lty=2)
+
+
+#bv_function <- function(x,r,omega) x - r*(x^omega)/(1+(x^omega))
+#allee_threshold <- uniroot(bv_function,r=r,omega=omega,interval=c(0.0001,0.9))$root
+#abline(v=allee_threshold,col='blue',lty=2)
+}
+
+par(mfrow=c(2,2),oma=c(4,4,2.5,1),mar=c(2,2,0.5,1))
+plot_reproductive_function(2,1,1)
+mtext(text = bquote(omega == 1),side = 3,line = 1,cex=1.2)
+mtext(text = bquote(r == 2),side = 2,line = 4,cex=1.2)
+plot_reproductive_function(2,1.5,1)
+mtext(text = bquote(omega == 1.5),side = 3,line = 1,cex=1.2)
+
+plot_reproductive_function(2.5,1,1)
+mtext(text = bquote(r == 2.5),side = 2,line = 4,cex=1.2)
+plot_reproductive_function(2.5,1.5,1)
+
+mtext(text = 'N(t)',side = 1,line = 1,outer = T,cex=1.4)
+mtext(text = 'N(t+1)',side = 2,line = 1,outer=T,cex=1.4)
+```
+-->
+
+
+# Additional figures
+
+
+```{r,eval=T,echo=F,cache=T,error=F,message=F,warning=F,fig.cap="Optimal spacing for varying Allee and r values along with different disturbance parameters.\\label{fig:allee_and_r}"}
+source('../scripts/two_patch/find_optimal_spacing_two_patch.R')
+
+# optimal spacing versus prob disturbance for different Allee and r values
+
+require(ggplot2)
+require(viridis)
+
+
+prob_vector = seq(0.001,1,by=0.2)
+#(-1/50)*log(prob_vector)
+K1 = 1
+r1_vector = seq(2,3,0.5)
+epsilon_vec = 0.5#seq(0.1,0.7,0.25)
+gamma_vector = 0.1#(-1/50)*log(prob_vector)#log(seq(0.0001,0.1,by=0.005))
+delta_vector = 0.01#(-1/50)*log(prob_vector)#log(seq(0.0001,0.05,0.005))
+
+prob_disturb_vec =seq(0,0.3,0.1)
+severity_disturb_vec = c(0.1,0.3,0.5)
+omega_vec = c(1,1.3,1.6)
+
+params_to_try = expand.grid(r1_vector,epsilon_vec,gamma_vector,delta_vector,prob_disturb_vec,severity_disturb_vec,omega_vec)
+names(params_to_try) <- c("r1_vector","epsilon_vec","gamma_vector","delta_vector","prob_disturb_vec","severity_disturb_vec","omega_vec")
+
+
+optimal_spacing = vector('numeric',nrow(params_to_try))
+prob_persistence = vector('numeric',nrow(params_to_try))
+for (param_trial in 1:nrow(params_to_try)){
+  optimal_spacing_output = find_optimal_spacing(params_to_try$r1_vector[param_trial],K1,params_to_try$delta_vector[param_trial],params_to_try$epsilon_vec[param_trial],params_to_try$omega_vec[param_trial],params_to_try$prob_disturb_vec[param_trial], params_to_try$severity_disturb_vec[param_trial],params_to_try$gamma_vector[param_trial])
+  optimal_spacing[param_trial]=optimal_spacing_output[1]
+  prob_persistence[param_trial]=(1-optimal_spacing_output[2])
+  #print(param_trial)
+}
+
+
+
+myoutput <- data.frame(params_to_try,optimal_spacing,prob_persistence)
+myoutput$severity_disturb_vec = 1 - myoutput$severity_disturb_vec
+
+ggplot(aes(x=prob_disturb_vec,y=optimal_spacing,shape=as.factor(severity_disturb_vec),color=prob_persistence),data=myoutput) + geom_line() + geom_point() + facet_grid(rows = vars(omega_vec), cols = vars(r1_vector))+
+   scale_color_viridis(discrete=FALSE,begin = 0.2,end=0.8) +
+   labs(color='Probability of persistence',shape = 'Disturbance mortality rate') +
+   xlab("Probability of disturbance") +
+   ylab("Optimal spacing between reserves") +
+   theme_classic(base_size = 14, base_family = "")
+
+
+#mm=lm(myoutput$optimal_spacing~myoutput$prob_disturb_vec*myoutput$severity_disturb_vec*myoutput$omega_vec)
+#summary(mm)
+```
+
+
+
+
+
+
+```{r,echo=F,cache=T,error=F,message=F,warning=F,fig.cap="Optimal spacing for different $\\gamma$, $\\delta$, r, and probability of disturbance.\\label{fig:disturb_vs_dispersal}"}
+source('../scripts/two_patch/find_optimal_spacing_two_patch.R')
+
+# optimal spacing versus prob disturbance for different disperer and r values.
+
+require(ggplot2)
+require(viridis)
+
+
+prob_vector = seq(0.001,1,by=0.2)
+#(-1/50)*log(prob_vector)
+K1 = 1
+r1_vector = seq(2.5,3,0.5)
+epsilon_vec = 0.7#seq(0.1,0.7,0.25)
+gamma_vector = (-1/50)*log(prob_vector)#log(seq(0.0001,0.1,by=0.005))
+delta_vector = (-1/50)*log(prob_vector)#log(seq(0.0001,0.05,0.005))
+
+prob_disturb_vec = 0.05#seq(0,0.3,0.05)
+severity_disturb_vec = 0.1#c(0.1,0.3,0.5)
+omega_vec = 1.2#c(1,1.2,1.4)
+
+params_to_try = expand.grid(r1_vector,epsilon_vec,gamma_vector,delta_vector,prob_disturb_vec,severity_disturb_vec,omega_vec)
+names(params_to_try) <- c("r1_vector","epsilon_vec","gamma_vector","delta_vector","prob_disturb_vec","severity_disturb_vec","omega_vec")
+
+
+optimal_spacing = vector('numeric',nrow(params_to_try))
+prob_persistence = vector('numeric',nrow(params_to_try))
+for (param_trial in 1:nrow(params_to_try)){
+  optimal_spacing_output = find_optimal_spacing(params_to_try$r1_vector[param_trial],K1,params_to_try$delta_vector[param_trial],params_to_try$epsilon_vec[param_trial],params_to_try$omega_vec[param_trial],params_to_try$prob_disturb_vec[param_trial], params_to_try$severity_disturb_vec[param_trial],params_to_try$gamma_vector[param_trial])
+  optimal_spacing[param_trial]=optimal_spacing_output[1]
+  prob_persistence[param_trial]=(optimal_spacing_output[2])
+  #print(param_trial)
+}
+
+
+
+myoutput <- data.frame(params_to_try,optimal_spacing,prob_persistence)
+myoutput$delta_vector = exp(-myoutput$delta_vector*50)
+myoutput$gamma_vector = exp(-myoutput$gamma_vector*50)
+
+ggplot(aes(x=delta_vector,y=optimal_spacing,color=prob_persistence,shape=as.factor(round(gamma_vector,4))),data=myoutput) + geom_point(alpha=0.8,size=1.5) + facet_wrap(~r1_vector) +
+   labs(color = 'Probability of persistence', shape = 'Probability disturbance spreads') +
+   scale_color_viridis(discrete=FALSE,begin = 0.2,end=0.8) +
+   xlab("Probability of successful dispersal") +
+   ylab("Optimal spacing between reserves") +
+   theme_classic(base_size = 14, base_family = "")
+
+```
+
+
+
+
+
+```{r,echo=F,eval=T,cache=T,error=F,message=F,warning=F,fig.cap="Optimal spacing for all the dispersal parameters and the probability of disturbance.\\label{fig:dispersal_params}"}
+source('../scripts/two_patch/find_optimal_spacing_two_patch.R')
+
+# optimal spacing versus prob disturbance for different Allee and r values
+
+require(ggplot2)
+require(viridis)
+
+
+prob_vector = seq(0.001,1,by=0.1)
+#(-1/50)*log(prob_vector)
+K1 = 1
+r1_vector = 2#seq(0.5,3,0.5)
+epsilon_vec = c(0.25,0.75)
+gamma_vector = (-1/50)*log(prob_vector)#log(seq(0.0001,0.1,by=0.005))
+delta_vector = (-1/50)*log(prob_vector)#log(seq(0.0001,0.05,0.005))
+
+prob_disturb_vec = 0.1#seq(0,0.3,0.05)
+severity_disturb_vec = 0.1#c(0.1,0.3,0.5)
+omega_vec = c(1,1.2)
+
+params_to_try = expand.grid(r1_vector,epsilon_vec,gamma_vector,delta_vector,prob_disturb_vec,severity_disturb_vec,omega_vec)
+names(params_to_try) <- c("r1_vector","epsilon_vec","gamma_vector","delta_vector","prob_disturb_vec","severity_disturb_vec","omega_vec")
+
+
+optimal_spacing = vector('numeric',nrow(params_to_try))
+prob_persistence = vector('numeric',nrow(params_to_try))
+for (param_trial in 1:nrow(params_to_try)){
+  optimal_spacing_output = find_optimal_spacing(params_to_try$r1_vector[param_trial],K1,params_to_try$delta_vector[param_trial],params_to_try$epsilon_vec[param_trial],params_to_try$omega_vec[param_trial],params_to_try$prob_disturb_vec[param_trial], params_to_try$severity_disturb_vec[param_trial],params_to_try$gamma_vector[param_trial])
+  optimal_spacing[param_trial]=optimal_spacing_output[1]
+  prob_persistence[param_trial]=(100-optimal_spacing_output[2])
+ # print(param_trial)
+}
+
+
+
+myoutput <- data.frame(params_to_try,optimal_spacing,prob_persistence)
+myoutput$delta_vector = round(exp(-myoutput$delta_vector*50),4)
+myoutput$gamma_vector = round(exp(-myoutput$gamma_vector*50),4)
+
+#myoutput <- subset(myoutput,myoutput$epsilon_vec==0.4)
+
+ggplot(aes(x=gamma_vector,y=delta_vector,fill=optimal_spacing),data=myoutput) + geom_tile() + facet_grid(vars(omega_vec),vars(epsilon_vec))+
+   scale_color_viridis(discrete=FALSE,begin = 0.2,end=0.8) +
+   labs(fill='Optimal spacing') +
+   xlab("Probability of disturbance in second patch") +
+   ylab("Probability of successful dispersal") +
+   theme_classic(base_size = 14, base_family = "")
+
+
+#mm=lm(myoutput$optimal_spacing~myoutput$prob_disturb_vec*myoutput$severity_disturb_vec*myoutput$omega_vec)
+#summary(mm)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- n-patch model runs -->
+
+
+
+
+
+
+
+```{r biased_disturbance, echo=FALSE,eval=FALSE,cache=TRUE,error=FALSE,message=FALSE,warning=FALSE,fig.cap='...\\label{biased_disturbance}'}
+
+# Show effects of disturbances not uniformly distributed....
+
+# Place reserves in one-third of landscape then in 1 of every three randomly distributed...Where should reserves then go?
+
+# Make plot of fraction of reserves situated in disturbed areas for different parameter values
+
+# Need to modify disturbance code to do this properly. Currently the code just says no disturbances happen in certain areas. But for not unbiased cases, this means the disturbance rates are much higher...
+
+biased_disturbance_side = FALSE
+biased_disturbance_rotating = FALSE
+source('big_loop.R')
+
+biased_disturbance_side = FALSE
+biased_disturbance_rotating = TRUE
+source('big_loop.R')
+
+biased_disturbance_side = TRUE
+biased_disturbance_rotating = FALSE
+source('big_loop.R')
+
+# So far it looks like you should only protect areas that aren't disturbed. This makes some sense. Would this change if we didn't have a scorched Earth assumption?
+
+```
+
+
+
+
+
+```{r reserve_percent,echo=FALSE,eval=TRUE,cache=TRUE,error=FALSE,message=FALSE,warning=FALSE,fig.cap='Optimal mean spacing between reserves for different probabilities of disturbance and fraction of coasline in reserves. The specific parameters used here include: $\\delta$ = 0.7, $\\omega$ = 1.2, r = 3, and $\\mu$ = 0.9.\\label{reserve_percent}'}
+
+# Run "big_loop" code with multiple reserve area sizes..
+require(viridis)
+colors <- viridis(3,begin = 0.2,end=0.8)
+
+
+biased_disturbance_rotating = FALSE
+biased_disturbance_side = FALSE
+num_reserves = 2
+source('../scripts/n_patch/big_loop.R')
+#write.csv(x = params_list,file=paste('params_list',num_reserves,'.csv',sep=''),quote = F,row.names = F)
+
+plot(params_list$disturbance_prob_vec,params_list$optimal_spacing-1,type='l',lwd=3,ylab='Optimal spacing between reserves',xlab="Probability of disturbance",cex.lab=1.3,ylim=c(0,6),las=1,col=colors[1],lty=1)
+
+num_reserves = 3
+source('../scripts/n_patch/big_loop.R')
+#write.csv(x = params_list,file=paste('params_list',num_reserves,'.csv',sep=''),quote = F,row.names = F)
+points(params_list$disturbance_prob_vec,params_list$optimal_spacing-1,type='l',lwd=3,ylab='Mean spacing in optimal reserve network',xlab="Probability of disturbance",cex=1.3,col=colors[2],lty=2)
+
+ num_reserves = 4
+ source('../scripts/n_patch/big_loop.R')
+ #write.csv(x = params_list,file=paste('params_list',num_reserves,'.csv',sep=''),quote = F,row.names = F)
+ points(params_list$disturbance_prob_vec,params_list$optimal_spacing-1,type='l',lwd=3,ylab='Mean spacing in optimal reserve network',xlab="Probability of disturbance",cex.lab=1.3,col=colors[3],lty=3)
+ 
+ # num_reserves = 5
+ # source('../scripts/n_patch/big_loop.R')
+ # #write.csv(x = params_list,file=paste('params_list',num_reserves,'.csv',sep=''),quote = F,row.names = F)
+ # points(params_list$disturbance_prob_vec,params_list$optimal_spacing-1,type='l',lwd=3,ylab='Mean spacing in optimal reserve network',xlab="Probability of disturbance",cex.lab=1.3,col=colors[4],lwd=2) 
+# 
+# 
+
+
+legend('topright',legend = c('0.17','0.25','0.33'),col = colors,pch = 16,lwd=2,lty=1:3)
+
+```
+
+
+
