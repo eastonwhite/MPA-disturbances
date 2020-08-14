@@ -45,7 +45,7 @@ $^{4}$Santa Fe Institute, Sante Fe, NM, USA}
 
 \vspace{1cm}
 
-Data and code for all the figures and tables can be found at (https://github.com/eastonwhite/MPA-disturbances). All the analyses were run in R.
+Data and code for all the figures and tables can be found at (https://github.com/eastonwhite/MPA-disturbances). 
 
 
 \clearpage
@@ -53,12 +53,13 @@ Data and code for all the figures and tables can be found at (https://github.com
 # $n$-patch model description
 
 
-To extend the model described in the main manuscript to an $n$-patch scenario, we use the Beverton-Holt structure within each patch and model spatially-explicit dispersal (i.e.\ resulting connectivity between patches) and disturbances. We focus on a coastline system (a simple one-dimensional landscape) where $d_{ij}$ is the distance between patches $i$ and $j$. We use geometric decay for the dispersal kernel, with a dispersal shape parameter $\delta$, where increasing $\delta$ decreases dispersal. The probability of dispersal is then
+To extend the two-patch model described in the main manuscript to an $n$-patch scenario, we have to use a slightly different model formulation. We use the same Beverton-Holt structure within each patch for production described in the main manuscript. However, we model spatially-explicit dispersal (i.e.\ resulting connectivity between patches) and disturbances. We focus on a coastline system (a simple one-dimensional landscape) where $d_{ij}$ is the distance between patches $i$ and $j$ (also see Figure 1d in main text). Thus, the patches are in a contiguous line and where discrete patches next to each other would have a distance of $d_{ij}=1$ between them. 
+
+We use geometric decay for the dispersal kernel, with a dispersal shape parameter $\delta$, where increasing $\delta$ decreases dispersal amount and distance. The probability of dispersal from patch $i$ to $j$ is
 
 \begin{equation}
 P(\mbox{dispersal from patch i to patch j}) = \text{Geometric}(\delta,d_{ij}).
 \end{equation}
-
 
 
 For disturbances, we model the probability of disturbance, $M_i$, in each patch as a binomial process with probability $p_i$: 
@@ -74,7 +75,7 @@ P(\mbox{disturbance in patch j } | \mbox{ disturbance in patch i}) =
 \end{cases}
 \end{equation}
 
-
+A disturbance causes density-independent mortality, $\mu$, for the entire patch and all patches with distance $x$.
 
 <!--
 \begin{equation}
@@ -85,12 +86,34 @@ P(\mbox{disturbance of size x})  \sim \text{Exponential}(-\lambda x)
 
 
 
-With this $n$-patch model, we can relax the assumption of a "scorched earth" between patches by setting the fishing rate in non-reserves to be $F<1$. This allows us to study the effect of fishing pressure outside reserves on the effectiveness of the marine reserve network.
+With this $n$-patch model, we can relax the assumption of a "scorched earth" between patches by setting the fraction of biomass fished in non-reserves to be $F<1$. This allows us to study the effect of fishing pressure outside reserves on the effectiveness of the marine reserve network.
+
+
+
+\begin{table}[]
+\begin{tabular}{|p{1.5cm} | p{10cm} | p{3cm}|}
+\hline 
+Notation & Description & Default value(s) \\ \hline \hline
+$r_i(t)$             & growth factor of patch $i$ at time $t$ described as a normal distribution       &       \\ \hline
+$\mu_r$              & mean of growth factor normal distribution            & 3      \\ \hline
+$\sigma_r^2$        & variance of growth factor normal distribution        &  0.5     \\ \hline
+$K_i$                & carrying capacity for patch $i$           & 1      \\ \hline
+$\omega$            & Allee effect parameter             & 1 for no Allee effect or $>$1 for Allee effect   \\ \hline
+$\delta$             & dispersal kernel shape parameter (larger $\delta$ indicates less dispersal)            &  0.7     \\ \hline
+$p_i$                & probability of disturbance            & 0.02       \\ \hline
+$x$             & size of disturbance (number of patches adjacent to disturbed patch that will also be disturbed)           & 1        \\ \hline
+$\mu$                & density-independent mortality from disturbance           & 0.9      \\ \hline
+$F$                & fraction of biomass fished in non-reserves         & for scorched earth assumption of all biomass caught or $<$1 for moderate levels of fishing      \\ \hline
+\end{tabular}
+\caption{Parameter notation, description, and default values for the n-patch model. As a sensitivity analysis, several parameters are varied in the Figs. 5,6, S4. \label{tab:parameters}} 
+\end{table}
+
+
 
 <!--
 \section{Growth functions}
 
-```{r,echo=F,eval=F,cache=T,error=F,message=F,warning=F,fig.cap="Growth functions for population size from year t to year t+1. Each panel represents a different combination of the intrinsic rate of increase (r) and the Allee paramter ($\\omega$). This is for the two-patch model.\\label{fig:growth_functions}"}
+```{r,echo=F,eval=F,cache=T,error=F,message=F,warning=F,fig.cap="Growth functions for population size from year t to year t+1. Each panel represents a different combination of the intrinsic rate of increase (r) and the Allee parameter ($\\omega$). This is for the two-patch model.\\label{fig:growth_functions}"}
 
 
 plot_reproductive_function = function(r,omega,K){
@@ -124,6 +147,7 @@ mtext(text = 'N(t+1)',side = 2,line = 1,outer=T,cex=1.4)
 ```
 -->
 
+\clearpage
 
 # Additional figures
 
@@ -184,7 +208,7 @@ ggplot(aes(x=prob_disturb_vec,y=optimal_spacing,shape=as.factor(severity_disturb
 
 
 
-```{r,echo=F,cache=T,error=F,message=F,warning=F,fig.cap="Optimal spacing for different $\\gamma$, $\\delta$, r, and probability of disturbance.\\label{fig:disturb_vs_dispersal}"}
+```{r,eval=T,echo=F,cache=T,error=F,message=F,warning=F,fig.cap="Optimal spacing for different $\\gamma$, $\\delta$, r, and probability of disturbance.\\label{fig:disturb_vs_dispersal}"}
 source('../scripts/two_patch/find_optimal_spacing_two_patch.R')
 
 # optimal spacing versus prob disturbance for different disperer and r values.
@@ -316,7 +340,7 @@ ggplot(aes(x=gamma_vector,y=delta_vector,fill=optimal_spacing),data=myoutput) + 
 
 
 
-
+<!--
 ```{r biased_disturbance, echo=FALSE,eval=FALSE,cache=TRUE,error=FALSE,message=FALSE,warning=FALSE,fig.cap='...\\label{biased_disturbance}'}
 
 # Show effects of disturbances not uniformly distributed....
@@ -342,12 +366,12 @@ source('big_loop.R')
 # So far it looks like you should only protect areas that aren't disturbed. This makes some sense. Would this change if we didn't have a scorched Earth assumption?
 
 ```
+-->
 
 
 
 
-
-```{r reserve_percent,echo=FALSE,eval=TRUE,cache=TRUE,error=FALSE,message=FALSE,warning=FALSE,fig.cap='Optimal mean spacing between reserves for different probabilities of disturbance and fraction of coasline in reserves. The specific parameters used here include: $\\delta$ = 0.7, $\\omega$ = 1.2, r = 3, and $\\mu$ = 0.9.\\label{reserve_percent}'}
+```{r reserve_percent,echo=FALSE,eval=T,cache=TRUE,error=FALSE,message=FALSE,warning=FALSE,fig.cap='Optimal mean spacing between reserves for different probabilities of disturbance and fraction of coasline in reserves. The specific parameters used here include: $\\delta$ = 0.7, $\\omega$ = 1.2, r = 3, and $\\mu$ = 0.9.\\label{reserve_percent}'}
 
 # Run "big_loop" code with multiple reserve area sizes..
 require(viridis)
