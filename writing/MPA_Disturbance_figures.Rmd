@@ -130,7 +130,10 @@ legend(x = 60,y = 0.8,legend = c('Patch 1','Patch 2'),col=c(1,2),lty=c(1,2),cex=
 
 ## Fig 3
 
-```{r optimal-spacing-simple-model, echo=FALSE,eval=T,cache=TRUE, error=FALSE,message=FALSE,warning=FALSE,fig.cap='Optimal spacing for different disturbance frequencies and mortality rates. Optimal spacing for the Beverton-Holt model (a) without ($\\omega=1$) and (b) with an Allee effect ($\\omega=1.2$). Each line indicates a different disturbance mortality rate. The color of each point is the fraction of runs where the end population size was non-zero, a measure of persistence. These simulations are with the same model parameters as in Fig. 2.\\label{optimal-spacing-simple-model}'}
+```{r optimal-spacing-simple-model-code, echo=FALSE,eval=F,cache=TRUE, error=FALSE,message=FALSE,warning=FALSE'}
+
+
+# Run models and create output csv files
 
 source('../scripts/two_patch/find_optimal_spacing_two_patch.R')
 
@@ -138,19 +141,20 @@ set.seed(123)
 
 # Parameters
 source('../scripts/two_patch/parameter_values_two_patch.R')
+source('../scripts/two_patch/simulate_model.R')
 
-prob_vector = seq(0.0,0.4,by=0.02)
+prob_vector = rep(seq(0.0,0.4,by=0.02),100)
 severity_vector = c(0.05,0.25,0.5)#c(0.01,0.1,0.25,0.5,0.75)#seq(0.01,0.3,by=0.025)
 params_to_try = expand.grid(prob_vector,severity_vector)
 
 
 optimal_spacing = vector('numeric',nrow(params_to_try))
 mean_pop_size = vector('numeric',nrow(params_to_try))
-for (param_trial in 1:nrow(params_to_try)){
-  optimal_spacing_output = find_optimal_spacing(r1,K1,delta,epsilon,omega,params_to_try[param_trial,1], params_to_try[param_trial,2], gamma)
+for (param_trial  in 1:nrow(params_to_try)){
+  optimal_spacing_output = find_optimal_spacing(r1,K1,delta,epsilon,omega,params_to_try[param_trial,1], params_to_try[param_trial,2], gamma,objective='persistence')
   optimal_spacing[param_trial]=optimal_spacing_output[1]
   mean_pop_size[param_trial]=optimal_spacing_output[2]
-  #print(param_trial)
+ # print(param_trial)
 }
 
 
@@ -158,20 +162,10 @@ myoutput <- data.frame(params_to_try,optimal_spacing,mean_pop_size)
 names(myoutput) <- c('disturbance_frequency','disturbance_mortality','optimal_spacing','mean_pop_size')
 myoutput$disturbance_mortality = 1-myoutput$disturbance_mortality
 myoutput$disturbance_mortality=as.factor(myoutput$disturbance_mortality)
-require(ggplot2)
-require(viridis)
-require(gridExtra)
-p1 <- ggplot(aes(x=disturbance_frequency,y=optimal_spacing,shape=as.factor(disturbance_mortality),col=mean_pop_size),data = myoutput)  + theme_classic(base_size = 14, base_family = "") + geom_point(size=2)+geom_line()  + coord_cartesian(xlim = c(0, 0.4)) + coord_cartesian(ylim = c(0, 50)) + theme(plot.title = element_text(size = 12, face = "plain")) +
-  labs(col='Probability of persistence') +
-  labs(shape='Disturbance mortality rate') +
-  xlab(" ") +
-  ylab(" ") +
-  ggtitle("No Allee effect") +
-  scale_color_viridis(begin = 0.2,end=0.8) +
-  theme(legend.position="none") 
- # annotate("text",x=0.35,y=10,label='Small disturbance',col='black') +
- # annotate("text",x=0.25,y=50,label='Large disturbance',col='black')+
-  annotate("text",x=0.35,y=45,label='(a)',col='black')
+
+write.csv(myoutput,file='../model_outputs/two_patch_optimal_spacing_vs_disturbance_regime_NoAllee_Fig3a.csv',quote = F)
+
+
 
 ########## MODEL WITH ALLEE EFFECTS
 
@@ -180,9 +174,11 @@ omega=1.2
 optimal_spacing = vector('numeric',nrow(params_to_try))
 mean_pop_size = vector('numeric',nrow(params_to_try))
 for (param_trial in 1:nrow(params_to_try)){
-  optimal_spacing_output = find_optimal_spacing(r1,K1,delta,epsilon,omega,params_to_try[param_trial,1], params_to_try[param_trial,2], gamma)
+  optimal_spacing_output = find_optimal_spacing(r1,K1,delta,epsilon,omega,params_to_try[param_trial,1], params_to_try[param_trial,2], gamma,objective='persistence')
   optimal_spacing[param_trial]=optimal_spacing_output[1]
   mean_pop_size[param_trial]=optimal_spacing_output[2]
+  
+  if (param_trial%%1000 == 0) {print(param_trial)}
   #print(param_trial)
 }
 
@@ -191,28 +187,72 @@ myoutput <- data.frame(params_to_try,optimal_spacing)
 names(myoutput) <- c('disturbance_frequency','disturbance_mortality','optimal_spacing')
 myoutput$disturbance_mortality = 1-myoutput$disturbance_mortality
 myoutput$disturbance_mortality=as.factor(myoutput$disturbance_mortality)
+
+
+write.csv(myoutput,file='../model_outputs/two_patch_optimal_spacing_vs_disturbance_regime_WithAllee_Fig3b.csv',quote = F)
+
+```
+
+
+```{r optimal-spacing-simple-model, echo=FALSE,eval=T,cache=TRUE, error=FALSE,message=FALSE,warning=FALSE,fig.cap='Optimal spacing for different disturbance frequencies and mortality rates. Optimal spacing for the Beverton-Holt model (a) without ($\\omega=1$) and (b) with an Allee effect ($\\omega=1.2$). Each line indicates a different disturbance mortality rate. The color of each point is the fraction of runs where the end population size was non-zero, a measure of persistence. These simulations are with the same model parameters as in Fig. 2.\\label{optimal-spacing-simple-model}'}
+
+model_output <- read.csv(file='../model_outputs/two_patch_optimal_spacing_vs_disturbance_regime_NoAllee_Fig3a.csv',header=T)
+
+require(dplyr)
+
+model_output <- model_output %>%
+  dplyr::group_by(disturbance_frequency,disturbance_mortality) %>%
+  dplyr::summarise(avg_optimal_spacing = mean(optimal_spacing),avg_optimal_spacing2.5 = as.numeric(quantile(optimal_spacing,probs=0.025)),avg_optimal_spacing97.5 = as.numeric(quantile(optimal_spacing,probs=0.975)))
+
 require(ggplot2)
-p2 <- ggplot(aes(x=disturbance_frequency,y=optimal_spacing,shape=as.factor(disturbance_mortality),col=mean_pop_size),data = myoutput)  + theme_classic(base_size = 14, base_family = "") + geom_point(size=2)+geom_line()  + coord_cartesian(xlim = c(0, 0.4)) + coord_cartesian(ylim = c(0, 50)) + theme(plot.title = element_text(size = 12, face = "plain")) +
-  labs(col='Probability of persistence') +
-  labs(shape='Disturbance mortality rate') +
+require(viridis)
+require(gridExtra)
+p1 <- ggplot(data=model_output) +
+   geom_ribbon(aes(x=disturbance_frequency,ymin=avg_optimal_spacing2.5,ymax=avg_optimal_spacing97.5 ,fill=as.factor(disturbance_mortality))) + scale_fill_viridis(discrete=T,alpha=0.1,guide=F) +
+   geom_line(aes(x=disturbance_frequency,y=avg_optimal_spacing,color=as.factor(disturbance_mortality)),size=1.5) + scale_color_viridis(discrete = T,alpha=0.5)   + theme_classic(base_size = 14, base_family = "")  + coord_cartesian(xlim = c(0, 0.4),ylim = c(0, 50)) + theme(plot.title = element_text(size = 12, face = "plain")) +
+  labs(col='Disturbance mortality rate') +
+  xlab(" ") +
+  ylab(" ") +
+  ggtitle("No Allee effect") +
+  theme(legend.position="none") +
+ # annotate("text",x=0.35,y=10,label='Small disturbance',col='black') +
+ # annotate("text",x=0.25,y=50,label='Large disturbance',col='black')+
+  annotate("text",x=0.35,y=45,label='(a)',col='black')
+
+
+########## MODEL WITH ALLEE EFFECTS
+
+model_output <- read.csv(file='../model_outputs/two_patch_optimal_spacing_vs_disturbance_regime_WithAllee_Fig3b.csv',header=T)
+
+require(dplyr)
+
+model_output <- model_output %>%
+  dplyr::group_by(disturbance_frequency,disturbance_mortality) %>%
+  dplyr::summarise(avg_optimal_spacing = mean(optimal_spacing),avg_optimal_spacing2.5 = as.numeric(quantile(optimal_spacing,probs=0.025)),avg_optimal_spacing97.5 = as.numeric(quantile(optimal_spacing,probs=0.975)))
+
+require(ggplot2)
+require(viridis)
+require(gridExtra)
+p2 <- ggplot(data=model_output) +
+   geom_ribbon(aes(x=disturbance_frequency,ymin=avg_optimal_spacing2.5,ymax=avg_optimal_spacing97.5 ,fill=as.factor(disturbance_mortality))) + scale_fill_viridis(discrete=T,alpha=0.1,guide=F) +
+   geom_line(aes(x=disturbance_frequency,y=avg_optimal_spacing,color=as.factor(disturbance_mortality)),size=1.5) + scale_color_viridis(discrete = T,alpha=0.5)   + theme_classic(base_size = 14, base_family = "")  + coord_cartesian(xlim = c(0, 0.4),ylim = c(0, 50)) + theme(plot.title = element_text(size = 12, face = "plain")) +
+  labs(col='Disturbance mortality rate') +
   xlab(" ") +
   ylab(" ") +
   ggtitle("Allee effect") +
-  scale_color_viridis(begin = 0.2,end=0.8) +
   theme(legend.position="none") +
  # annotate("text",x=0.35,y=10,label='Small disturbance',col='black') +
  # annotate("text",x=0.25,y=50,label='Large disturbance',col='black')+
   annotate("text",x=0.35,y=45,label='(b)',col='black')
 
 
-
 library(ggpubr)
 
 #pdf(file = 'figures/two_patch_optimal_spacing.pdf',width=8,height=5)
-figure=ggarrange(p1, p2, ncol=1, nrow=2, common.legend = TRUE, legend="right")
+figure=ggarrange(p1, p2, ncol=1, nrow=2, common.legend = TRUE, legend="top")
 annotate_figure(figure,
                bottom = text_grob("Disturbance frequency", color = "black",
-                                  hjust = 0.9,vjust=-1, x = 0.5, size = 14),
+                          hjust = 0.5,vjust=-1, x = 0.5, size = 14),
                left = text_grob("Optimal spacing between reserves", color = "black", rot = 90,size=14,vjust=2,hjust=0.4)
 )
 #dev.off()
@@ -243,10 +283,10 @@ params_to_try = expand.grid(gamma_vector,delta_vector)
 optimal_spacing = vector('numeric',nrow(params_to_try))
 mean_pop_size = vector('numeric',nrow(params_to_try))
 for (param_trial in 1:nrow(params_to_try)){
-  optimal_spacing_output = find_optimal_spacing(r1,K1,params_to_try[param_trial,2],epsilon,omega,0.1, 0.25, params_to_try[param_trial,1])
+  optimal_spacing_output = find_optimal_spacing(r1,K1,params_to_try[param_trial,2],epsilon,omega,0.1, 0.25, params_to_try[param_trial,1],objective='persistence')
   optimal_spacing[param_trial]=optimal_spacing_output[1]
   mean_pop_size[param_trial]=optimal_spacing_output[2]
-  print(param_trial)
+  #print(param_trial)
 }
 
 
@@ -290,7 +330,7 @@ params_to_try = expand.grid(gamma_vector,delta_vector)
 optimal_spacing = vector('numeric',nrow(params_to_try))
 mean_pop_size = vector('numeric',nrow(params_to_try))
 for (param_trial in 1:nrow(params_to_try)){
-  optimal_spacing_output = find_optimal_spacing(r1,K1,params_to_try[param_trial,2],epsilon,omega,0.1, 0.25, params_to_try[param_trial,1])
+  optimal_spacing_output = find_optimal_spacing(r1,K1,params_to_try[param_trial,2],epsilon,omega,0.1, 0.25, params_to_try[param_trial,1],objective='persistence')
   optimal_spacing[param_trial]=optimal_spacing_output[1]
   mean_pop_size[param_trial]=optimal_spacing_output[2]
   #print(param_trial)
@@ -555,7 +595,7 @@ for (param_index in 1:nrow(params_list)){
   params_list$optimal_spacing[param_index] <- mean(diff(optimal_reserves))
   params_list$mean_objective_value[param_index] <- -ranked_configs[1,1+num_reserves]
   
-  print(paste(param_index,':',params_list$optimal_spacing[param_index],sep = ''))
+  #print(paste(param_index,':',params_list$optimal_spacing[param_index],sep = ''))
 }
 
 
