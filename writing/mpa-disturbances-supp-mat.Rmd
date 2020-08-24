@@ -152,8 +152,14 @@ mtext(text = 'N(t+1)',side = 2,line = 1,outer=T,cex=1.4)
 # Additional figures
 
 
-```{r,eval=T,echo=F,cache=T,error=F,message=F,warning=F,fig.cap="Optimal spacing for varying Allee and r values along with different disturbance parameters.\\label{fig:allee_and_r}"}
+```{r allee_and_r_code,eval=F,echo=F,cache=T,error=F,message=F,warning=F,fig.cap="Optimal spacing for varying Allee and r values along with different disturbance parameters.\\label{fig:allee_and_r}"}
 source('../scripts/two_patch/find_optimal_spacing_two_patch.R')
+
+set.seed(123)
+
+# Parameters
+source('../scripts/two_patch/parameter_values_two_patch.R')
+source('../scripts/two_patch/simulate_model.R')
 
 # optimal spacing versus prob disturbance for different Allee and r values
 
@@ -174,13 +180,14 @@ severity_disturb_vec = c(0.1,0.3,0.5)
 omega_vec = c(1,1.3,1.6)
 
 params_to_try = expand.grid(r1_vector,epsilon_vec,gamma_vector,delta_vector,prob_disturb_vec,severity_disturb_vec,omega_vec)
+params_to_try <- params_to_try[rep(seq(nrow(params_to_try)), each = 5), ]
 names(params_to_try) <- c("r1_vector","epsilon_vec","gamma_vector","delta_vector","prob_disturb_vec","severity_disturb_vec","omega_vec")
 
 
 optimal_spacing = vector('numeric',nrow(params_to_try))
 prob_persistence = vector('numeric',nrow(params_to_try))
 for (param_trial in 1:nrow(params_to_try)){
-  optimal_spacing_output = find_optimal_spacing(params_to_try$r1_vector[param_trial],K1,params_to_try$delta_vector[param_trial],params_to_try$epsilon_vec[param_trial],params_to_try$omega_vec[param_trial],params_to_try$prob_disturb_vec[param_trial], params_to_try$severity_disturb_vec[param_trial],params_to_try$gamma_vector[param_trial])
+  optimal_spacing_output = find_optimal_spacing(params_to_try$r1_vector[param_trial],K1,params_to_try$delta_vector[param_trial],params_to_try$epsilon_vec[param_trial],params_to_try$omega_vec[param_trial],params_to_try$prob_disturb_vec[param_trial], params_to_try$severity_disturb_vec[param_trial],params_to_try$gamma_vector[param_trial],objective = 'persistence')
   optimal_spacing[param_trial]=optimal_spacing_output[1]
   prob_persistence[param_trial]=(1-optimal_spacing_output[2])
   #print(param_trial)
@@ -190,25 +197,65 @@ for (param_trial in 1:nrow(params_to_try)){
 
 myoutput <- data.frame(params_to_try,optimal_spacing,prob_persistence)
 myoutput$severity_disturb_vec = 1 - myoutput$severity_disturb_vec
+myoutput$optimal_spacing <- myoutput$optimal_spacing-1
 
-ggplot(aes(x=prob_disturb_vec,y=optimal_spacing,shape=as.factor(severity_disturb_vec),color=prob_persistence),data=myoutput) + geom_line() + geom_point() + facet_grid(rows = vars(omega_vec), cols = vars(r1_vector))+
-   scale_color_viridis(discrete=FALSE,begin = 0.2,end=0.8) +
-   labs(color='Probability of persistence',shape = 'Disturbance mortality rate') +
-   xlab("Probability of disturbance") +
-   ylab("Optimal spacing between reserves") +
-   theme_classic(base_size = 14, base_family = "")
+write.csv(myoutput,file='../model_outputs/two_patch_optimal_spacing_vs_disturbance_regime_Allee_and_r_FigS1.csv',quote = F)
+
+```
 
 
-#mm=lm(myoutput$optimal_spacing~myoutput$prob_disturb_vec*myoutput$severity_disturb_vec*myoutput$omega_vec)
-#summary(mm)
+
+
+```{r allee_and_r,eval=T,echo=F,cache=T,error=F,message=F,warning=F,fig.cap="Optimal spacing for varying Allee and r values along with different disturbance parameters.\\label{fig:allee_and_r}"}
+
+model_output <- read.csv(file='../model_outputs/two_patch_optimal_spacing_vs_disturbance_regime_Allee_and_r_FigS1.csv',header = T)
+
+require(dplyr)
+
+model_output2 <- model_output %>%
+  dplyr::group_by(prob_disturb_vec,severity_disturb_vec,omega_vec,r1_vector) %>%
+  dplyr::summarise(avg_optimal_spacing = mean(optimal_spacing),avg_optimal_spacing2.5 = as.numeric(quantile(optimal_spacing,probs=0.025)),avg_optimal_spacing97.5 = as.numeric(quantile(optimal_spacing,probs=0.975)))
+
+require(ggplot2)
+require(viridis)
+p1 <- ggplot(data=model_output2) +
+   geom_ribbon(aes(x=prob_disturb_vec,ymin=avg_optimal_spacing2.5,ymax=avg_optimal_spacing97.5 ,fill=as.factor(severity_disturb_vec))) + scale_fill_viridis(discrete=T,alpha=0.1,guide=F) +
+   geom_line(aes(x=prob_disturb_vec,y=avg_optimal_spacing,color=as.factor(severity_disturb_vec)),size=1.5) + scale_color_viridis(discrete = T,alpha=0.5)   + theme_classic(base_size = 14, base_family = "")  + coord_cartesian(xlim = c(0, 0.4),ylim = c(0, 50)) + theme(plot.title = element_text(size = 12, face = "plain")) +
+  labs(col='Disturbance mortality rate') +
+  xlab(" ") +
+  ylab(" ") +
+  labs("No Allee effect") +
+  theme(legend.position="bottom") +
+ # annotate("text",x=0.35,y=10,label='Small disturbance',col='black') +
+ # annotate("text",x=0.25,y=50,label='Large disturbance',col='black')+
+  #annotate("text",x=0.35,y=45,label='(a)',col='black') +
+  facet_grid(rows = vars(omega_vec), cols = vars(r1_vector))
+
+library(latex2exp)
+library(ggpubr)
+figure=ggarrange(p1, ncol=1, nrow=1, common.legend = TRUE, legend="bottom")
+annotate_figure(figure,
+               bottom = text_grob("Disturbance frequency", color = "black",hjust = 0.5,vjust=-4, x = 0.5, size = 14),
+               left = text_grob("Optimal spacing between reserves", color = "black", rot = 90,size=14,vjust=2,hjust=0.4),
+               right = text_grob(TeX("Allee parameter ($\\omega$)"), color = "black", rot = 270,size=14,vjust=1,hjust=0.9),
+               top = text_grob("r", color = "black", rot = 0,size=14,vjust=1,hjust=2.5)
+)
+
+#ggplot(aes(x=prob_disturb_vec,y=optimal_spacing,shape=as.factor(severity_disturb_vec),color=prob_persistence),data=model_output) + geom_line() + geom_point() + facet_grid(rows = vars(omega_vec), cols = vars(r1_vector))+
+#   scale_color_viridis(discrete=FALSE,begin = 0.2,end=0.8) +
+#   labs(color='Probability of persistence',shape = 'Disturbance mortality rate') +
+#   xlab("Probability of disturbance") +
+#   ylab("Optimal spacing between reserves") +
+#   theme_classic(base_size = 14, base_family = "")
+
 ```
 
 
 
 
 
-
-```{r,eval=T,echo=F,cache=T,error=F,message=F,warning=F,fig.cap="Optimal spacing for different $\\gamma$, $\\delta$, r, and probability of disturbance.\\label{fig:disturb_vs_dispersal}"}
+<!--
+```{r,eval=F,echo=F,cache=T,error=F,message=F,warning=F,fig.cap="Optimal spacing for different $\\gamma$, $\\delta$, r, and probability of disturbance.\\label{fig:disturb_vs_dispersal}"}
 source('../scripts/two_patch/find_optimal_spacing_two_patch.R')
 
 # optimal spacing versus prob disturbance for different disperer and r values.
@@ -256,13 +303,19 @@ ggplot(aes(x=delta_vector,y=optimal_spacing,color=prob_persistence,shape=as.fact
    theme_classic(base_size = 14, base_family = "")
 
 ```
+-->
 
 
 
 
-
-```{r,echo=F,eval=T,cache=T,error=F,message=F,warning=F,fig.cap="Optimal spacing for all the dispersal parameters and the probability of disturbance.\\label{fig:dispersal_params}"}
+```{r dispersal_params_code,echo=F,eval=F,cache=T,error=F,message=F,warning=F}
 source('../scripts/two_patch/find_optimal_spacing_two_patch.R')
+
+set.seed(123)
+
+# Parameters
+source('../scripts/two_patch/parameter_values_two_patch.R')
+source('../scripts/two_patch/simulate_model.R')
 
 # optimal spacing versus prob disturbance for different Allee and r values
 
@@ -289,10 +342,10 @@ names(params_to_try) <- c("r1_vector","epsilon_vec","gamma_vector","delta_vector
 optimal_spacing = vector('numeric',nrow(params_to_try))
 prob_persistence = vector('numeric',nrow(params_to_try))
 for (param_trial in 1:nrow(params_to_try)){
-  optimal_spacing_output = find_optimal_spacing(params_to_try$r1_vector[param_trial],K1,params_to_try$delta_vector[param_trial],params_to_try$epsilon_vec[param_trial],params_to_try$omega_vec[param_trial],params_to_try$prob_disturb_vec[param_trial], params_to_try$severity_disturb_vec[param_trial],params_to_try$gamma_vector[param_trial])
-  optimal_spacing[param_trial]=optimal_spacing_output[1]
+  optimal_spacing_output = find_optimal_spacing(params_to_try$r1_vector[param_trial],K1,params_to_try$delta_vector[param_trial],params_to_try$epsilon_vec[param_trial],params_to_try$omega_vec[param_trial],params_to_try$prob_disturb_vec[param_trial], params_to_try$severity_disturb_vec[param_trial],params_to_try$gamma_vector[param_trial],objective = 'persistance')
+  optimal_spacing[param_trial]=optimal_spacing_output[1]-1
   prob_persistence[param_trial]=(100-optimal_spacing_output[2])
- # print(param_trial)
+  #print(param_trial)
 }
 
 
@@ -301,18 +354,31 @@ myoutput <- data.frame(params_to_try,optimal_spacing,prob_persistence)
 myoutput$delta_vector = round(exp(-myoutput$delta_vector*50),4)
 myoutput$gamma_vector = round(exp(-myoutput$gamma_vector*50),4)
 
-#myoutput <- subset(myoutput,myoutput$epsilon_vec==0.4)
+write.csv(myoutput,file='../model_outputs/two_patch_optimal_spacing_vs_dispersal_params_FigS2.csv',quote = F)
+```
 
-ggplot(aes(x=gamma_vector,y=delta_vector,fill=optimal_spacing),data=myoutput) + geom_tile() + facet_grid(vars(omega_vec),vars(epsilon_vec))+
-   scale_color_viridis(discrete=FALSE,begin = 0.2,end=0.8) +
+
+```{r dispersal_params,echo=F,eval=T,cache=T,error=F,message=F,warning=F,fig.cap="The optimal spacing between two reserves for population persistence given different combinations of successful dispersal probability and the probability that a disturbance in one patch affects the nearby second patch (i.e. $\\gamma$ and $\\delta$ are varied to produce the linear probabilities shown on axes for an inter-patch distance of 50) as well as the probability of dispersal ($\\epsilon$) and the Allee parameter ($\\omega$).\\label{fig:dispersal_params}"}
+
+require(ggplot2)
+require(viridis)
+model_output <- read.csv(file='../model_outputs/two_patch_optimal_spacing_vs_dispersal_params_FigS2.csv',header=T)
+
+p1 <- ggplot(aes(x=gamma_vector,y=delta_vector,fill=optimal_spacing),data=model_output) + geom_tile() + facet_grid(vars(omega_vec),vars(epsilon_vec))+
+   scale_fill_viridis(discrete=FALSE,begin = 0.2,end=0.8) +
    labs(fill='Optimal spacing') +
    xlab("Probability of disturbance in second patch") +
    ylab("Probability of successful dispersal") +
    theme_classic(base_size = 14, base_family = "")
 
+library(latex2exp)
+library(ggpubr)
+figure=ggarrange(p1, ncol=1, nrow=1, common.legend = TRUE, legend="bottom")
+annotate_figure(figure,
+               right = text_grob(TeX("Allee parameter ($\\omega$)"), color = "black", rot = 270,size=14,vjust=1,hjust=0.9),
+               top = text_grob(TeX("Probability of dispersal ($\\epsilon$)"), color = "black", rot = 0,size=14,vjust=1,hjust=0.4)
+)
 
-#mm=lm(myoutput$optimal_spacing~myoutput$prob_disturb_vec*myoutput$severity_disturb_vec*myoutput$omega_vec)
-#summary(mm)
 ```
 
 
@@ -371,42 +437,52 @@ source('big_loop.R')
 
 
 
-```{r reserve_percent,echo=FALSE,eval=T,cache=TRUE,error=FALSE,message=FALSE,warning=FALSE,fig.cap='Optimal mean spacing between reserves for different probabilities of disturbance and fraction of coasline in reserves. The specific parameters used here include: $\\delta$ = 0.7, $\\omega$ = 1.2, r = 3, and $\\mu$ = 0.9.\\label{reserve_percent}'}
+```{r reserve_percent_code,echo=FALSE,eval=F,cache=TRUE,error=FALSE,message=FALSE,warning=FALSE'}
 
 # Run "big_loop" code with multiple reserve area sizes..
-require(viridis)
-colors <- viridis(3,begin = 0.2,end=0.8)
-
+params_list_overall <- NULL
 
 biased_disturbance_rotating = FALSE
 biased_disturbance_side = FALSE
-num_reserves = 2
-source('../scripts/n_patch/big_loop.R')
-#write.csv(x = params_list,file=paste('params_list',num_reserves,'.csv',sep=''),quote = F,row.names = F)
 
-plot(params_list$disturbance_prob_vec,params_list$optimal_spacing-1,type='l',lwd=3,ylab='Optimal spacing between reserves',xlab="Probability of disturbance",cex.lab=1.3,ylim=c(0,6),las=1,col=colors[1],lty=1)
+# Source files
+source('../scripts/n_patch/evalFunc.R')
+source('../scripts/n_patch/simulate_model_N_patches.R')
 
-num_reserves = 3
-source('../scripts/n_patch/big_loop.R')
-#write.csv(x = params_list,file=paste('params_list',num_reserves,'.csv',sep=''),quote = F,row.names = F)
-points(params_list$disturbance_prob_vec,params_list$optimal_spacing-1,type='l',lwd=3,ylab='Mean spacing in optimal reserve network',xlab="Probability of disturbance",cex=1.3,col=colors[2],lty=2)
+# Run scripts
+num_reserves_vec <- rev(c(rep(2,3),rep(3,3)))#,rep(4,10)))
 
- num_reserves = 4
- source('../scripts/n_patch/big_loop.R')
- #write.csv(x = params_list,file=paste('params_list',num_reserves,'.csv',sep=''),quote = F,row.names = F)
- points(params_list$disturbance_prob_vec,params_list$optimal_spacing-1,type='l',lwd=3,ylab='Mean spacing in optimal reserve network',xlab="Probability of disturbance",cex.lab=1.3,col=colors[3],lty=3)
- 
- # num_reserves = 5
- # source('../scripts/n_patch/big_loop.R')
- # #write.csv(x = params_list,file=paste('params_list',num_reserves,'.csv',sep=''),quote = F,row.names = F)
- # points(params_list$disturbance_prob_vec,params_list$optimal_spacing-1,type='l',lwd=3,ylab='Mean spacing in optimal reserve network',xlab="Probability of disturbance",cex.lab=1.3,col=colors[4],lwd=2) 
-# 
-# 
+for (reserve_index in 1:length(num_reserves_vec)){
+  num_reserves = num_reserves_vec[reserve_index]
+  source('../scripts/n_patch/big_loop.R')
+  params_list$num_reserves <- num_reserves
+  params_list_overall <- rbind(params_list_overall,params_list)
+ print(reserve_index)
+}
 
-
-legend('topright',legend = c('0.17','0.25','0.33'),col = colors,pch = 16,lwd=2,lty=1:3)
+write.csv(params_list_overall,file='../model_outputs/n_patch_optimal_spacing_vs_fraction_of_coastline_FigS3.csv',quote = F)
 
 ```
 
 
 
+```{r reserve_percent,echo=FALSE,eval=T,cache=TRUE,error=FALSE,message=FALSE,warning=FALSE,fig.cap='Optimal mean spacing between reserves for different probabilities of disturbance and fraction of coasline in reserves. The specific parameters used here include: $\\delta$ = 0.7, $\\omega$ = 1.2, r = 3, and $\\mu$ = 0.9.\\label{reserve_percent}'}
+
+params_list <- read.csv(file='../model_outputs/n_patch_optimal_spacing_vs_fraction_of_coastline_FigS3.csv',header=T)
+
+params_list  <- params_list  %>%
+  dplyr::group_by(disturbance_prob_vec,num_reserves) %>%
+  dplyr::summarise(avg_optimal_spacing = mean(optimal_spacing),avg_optimal_spacing2.5 = as.numeric(quantile(optimal_spacing,probs=0.025)),avg_optimal_spacing97.5 = as.numeric(quantile(optimal_spacing,probs=0.975)))
+
+
+require(ggplot2)
+require(viridis)
+require(gridExtra)
+ggplot(data=params_list) +
+   geom_ribbon(aes(x=disturbance_prob_vec,ymin=avg_optimal_spacing2.5,ymax=avg_optimal_spacing97.5 ,fill=as.factor(round(num_reserves/16,2)))) + scale_fill_viridis(discrete=T,alpha=0.1,guide=F) +
+   geom_line(aes(x=disturbance_prob_vec,y=avg_optimal_spacing,color=as.factor(round(num_reserves/16,2))),size=1.5) + scale_color_viridis(discrete = T,alpha=0.5)   + theme_classic(base_size = 14, base_family = "")   + theme(plot.title = element_text(size = 12, face = "plain")) +
+  labs(color='Fraction in reserves') +
+  xlab("Disturbance probability") +
+  ylab("Optimal spacing between reserves") 
+
+```

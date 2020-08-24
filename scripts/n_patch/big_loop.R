@@ -1,14 +1,11 @@
-aaa=Sys.time()
 
-# Source files
 
-source('../scripts/n_patch/evalFunc.R')
-source('../scripts/n_patch/simulate_model_N_patches.R')
+
 
 
 # Parameter values
 
-num_patches=12
+num_patches=16
 #specify_fraction_reserves = TRUE
 #if (specify_fraction_reserves == FALSE){fraction_reserves = 0.05}
 
@@ -21,12 +18,12 @@ num_trials = 300
 
 
 fishing_values_vec = 1#c(0.5,0.75,1)#seq(0.3,0.9,by=0.25)
-r_value_vec = 3#seq(2.5,3,by=1)
+r_value_vec = 2.3#seq(2.5,3,by=1)
 omega_value_vec = 1.2#seq(1.2,1.4,by=0.2)
 dispersal_value_vec = c(0.7)#seq(0.02,1,by=0.3)
 K = 1
 
-disturbance_prob_vec = seq(0,0.015,0.001)
+disturbance_prob_vec = 0#seq(0,0.015,0.001)
 disturbance_size_vec = 2#c(1,2)
 disturbance_magnitude_vec = c(0.9)#seq(0.7,0.9,0.2)
 
@@ -68,16 +65,16 @@ for (param_index in 1:nrow(params_list)){
   
  # Run code for one combination of parameters and return optimal configuration... 
   source('../scripts/n_patch/run_code_for_N_patch_model.R')
-  params_list$optimal_spacing[param_index] <- mean(diff(optimal_reserves))
+  params_list$optimal_spacing[param_index] <- mean(diff(optimal_reserves)-1)
   params_list$mean_objective_value[param_index] <- -ranked_configs[1,1+num_reserves]
   optimal_reserves_matrix[param_index,] <- optimal_reserves
 
-  #print(paste(param_index,':',params_list$optimal_spacing[param_index],sep = ''))
+ # print(paste(param_index,':',params_list$optimal_spacing[param_index],sep = ''))
   #print(head(ranked_configs))
 }
 
 
-params_list <- cbind(params_list,optimal_reserves_matrix)
+#params_list <- cbind(params_list,optimal_reserves_matrix)
 
 
 

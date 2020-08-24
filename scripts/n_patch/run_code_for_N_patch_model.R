@@ -4,6 +4,11 @@
   
 # This line specifies which reserve combinations someone wants to run. It is best to leave out reserves on the ends as they would have high mortality sending recruits outside the reserve
 configs_to_try = t(combn((extra_patches+3):(extra_patches+num_patches-2), num_reserves))
+## Optional line to stick one reserve in the middle
+#configs_to_try = configs_to_try[1:(which(configs_to_try[,1]==(extra_patches+3+1))[1]-1),]
+configs_to_try = configs_to_try[configs_to_try[,round(num_reserves/2)]==round(mean(range(configs_to_try))),]
+###
+
 result=matrix(0,nrow=nrow(configs_to_try),ncol=(num_reserves+1))
 
 for (index1 in 1:nrow(configs_to_try)){
@@ -27,7 +32,10 @@ for (index1 in 1:nrow(configs_to_try)){
   #   #print(optimal_spacing[value])
   # }else{
 
-    
+  #print(ranked_configs[1:5,])
+    if (is.na(ranked_configs[1,1+num_reserves]) | ranked_configs[1,1+num_reserves] == -num_trials){
+      ranked_configs = matrix(NA,nrow=nrow(ranked_configs),ncol=ncol(ranked_configs))
+    }
     optimal_reserves= ranked_configs[1,1:num_reserves]
 #}
    # optimal_spacing[value] = diff(optimal_reserves)#mean(mean(apply(optimal_reserves,1,FUN=diff)))
