@@ -41,9 +41,9 @@ knitr::opts_chunk$set(fig.pos = 'H')
 ```
 
 
-## Fig 2
+## Figure 2
 
-```{r pop-dyn, echo=F,eval=T,error=FALSE,message=F,warning=FALSE,fig.cap='Example two-patch model simulation, each line denotes a different patch. The four panels represent different combinations of disturbance frequency and the presence (\\(\\omega>1\\)) or absence of an Allee effect. The horizontal line denotes the Allee threshold. The simulation is with the following model parameters: \\(r = 2.0\\) , \\(K=1\\), \\(\\delta = 0.01\\), \\(\\epsilon = 0.5\\), and distance between patches of 40.  \\label{fig:pop-dyn}',fig.height=4}
+```{r pop-dyn, echo=F,eval=T,error=FALSE,message=F,warning=FALSE,fig.cap='Example two-patch model simulation, each line denotes a different patch. The four panels represent different combinations of disturbance frequency and the presence (\\(\\omega>1\\)) or absence of an Allee effect. The horizontal line denotes the Allee threshold. The simulation is with the following model parameters: \\(r = 2.0\\) , \\(K=1\\), \\(\\delta = 0.01\\), \\(\\epsilon = 0.5\\), and distance between patches of 40.  \\label{fig:pop-dyn}',fig.height=5}
 #parameters
 
 source('../scripts/two_patch/simulate_model.R')
@@ -59,7 +59,7 @@ N1 = time_series[1,]
 N2 = time_series[2,]
 
 
-plot(N1,type='l',ylim=c(0,1.1),xlab='',ylab='',las=1,xaxt='n')
+plot(N1,type='l',ylim=c(0,2.5),xlab='',ylab='',las=1,xaxt='n')
 points(N2,type='l',col='red',lty=2)
 mtext(text = 'disturbance frequency = 0.02',side = 3,line = -1,adj=0.9)
 mtext(text = '(a)',side = 3,line = -1,adj=0.02)
@@ -71,16 +71,16 @@ mtext(text = expression(paste("No Allee effect ( ", omega, "=1)")),side = 3,line
 
 
 set.seed(123)
-prob_disturb=0.2
+prob_disturb=0.3
 time_series = simulate_model(r1,K1,delta,epsilon,omega,prob_disturb, severity_disturb, gamma, distance,output_time_series = TRUE)
 N1 = time_series[1,]
 N2 = time_series[2,]
 
 #par(mfrow=c(1,2))
-plot(N1,type='l',ylim=c(0,1.1),xlab='',ylab='',las=1)
+plot(N1,type='l',ylim=c(0,2.5),xlab='',ylab='',las=1)
 points(N2,type='l',col='red',lty=2)
 mtext(text = '(b)',side = 3,line = -1,adj=0.02)
-mtext(text = 'disturbance frequency = 0.20',side = 3,line = -1,adj=0.9)
+mtext(text = 'disturbance frequency = 0.30',side = 3,line = -1,adj=0.9)
 mtext(text = 'Time (years)',side = 1,line = 0.5,outer = T,cex = 1.2)
 mtext(text = 'Population size',side = 2,line = 2.4,outer = T,cex = 1.2)
 
@@ -95,7 +95,7 @@ time_series = simulate_model(r1,K1,delta,epsilon,omega,prob_disturb, severity_di
 N1 = time_series[1,]
 N2 = time_series[2,]
 
-plot(N1,type='l',ylim=c(0,1.1),xlab='',ylab='',las=1,yaxt='n',xaxt='n')
+plot(N1,type='l',ylim=c(0,2.5),xlab='',ylab='',las=1,yaxt='n',xaxt='n')
 points(N2,type='l',col='red',lty=2)
 mtext(text = '(c)',side = 3,line = -1,adj=0.02)
 mtext(text = 'disturbance frequency = 0.02',side = 3,line = -1,adj=0.9)
@@ -108,27 +108,27 @@ mtext(text = expression(paste("Allee effect ( ", omega, "=1.2)")),side = 3,line 
 
 set.seed(123)
 omega=1.2
-prob_disturb=0.2
+prob_disturb=0.3
 time_series = simulate_model(r1,K1,delta,epsilon,omega,prob_disturb, severity_disturb, gamma, distance,output_time_series = TRUE)
 N1 = time_series[1,]
 N2 = time_series[2,]
 
 #par(mfrow=c(1,2))
-plot(N1,type='l',ylim=c(0,1.1),xlab='',ylab='',las=1,yaxt='n')
+plot(N1,type='l',ylim=c(0,2.5),xlab='',ylab='',las=1,yaxt='n')
 points(N2,type='l',col='red',lty=2)
 mtext(text = '(d)',side = 3,line = -1,adj=0.02)
-mtext(text = 'disturbance frequency = 0.20',side = 3,line = -1,adj=0.9)
+mtext(text = 'disturbance frequency = 0.30',side = 3,line = -1,adj=0.9)
 mtext(text = 'Time (years)',side = 1,line = 0.5,outer = T,cex = 1.2)
 mtext(text = 'Population size',side = 2,line = 2.4,outer = T,cex = 1.2)
 abline(h= uniroot(bv_function,r1=r1,omega=omega,interval=c(0.0001,0.9))$root,col='blue')
 
-legend(x = 60,y = 0.8,legend = c('Patch 1','Patch 2'),col=c(1,2),lty=c(1,2),cex=1.2)
+legend(x = 50,y = 1.5,legend = c('Patch 1','Patch 2'),col=c(1,2),lty=c(1,2),cex=1.2)
 
 ```
 
 \clearpage
 
-## Fig 3
+## Figure 3
 
 ```{r optimal-spacing-simple-model-code, echo=FALSE,eval=F,cache=TRUE, error=FALSE,message=FALSE,warning=FALSE}
 
@@ -143,7 +143,7 @@ set.seed(123)
 source('../scripts/two_patch/parameter_values_two_patch.R')
 source('../scripts/two_patch/simulate_model.R')
 
-prob_vector = rep(seq(0.0,0.4,by=0.02),100)
+prob_vector = rep(seq(0,0.5,by=0.02),5)
 severity_vector = c(0.05,0.25,0.5)#c(0.01,0.1,0.25,0.5,0.75)#seq(0.01,0.3,by=0.025)
 params_to_try = expand.grid(prob_vector,severity_vector)
 
@@ -194,7 +194,7 @@ write.csv(myoutput,file='../model_outputs/two_patch_optimal_spacing_vs_disturban
 ```
 
 
-```{r optimal-spacing-simple-model, echo=FALSE,eval=T,cache=TRUE,fig.height=6, error=FALSE,message=FALSE,warning=FALSE,fig.cap='Optimal spacing for different disturbance frequencies and mortality rates. Optimal spacing for the Beverton-Holt model (a) without ($\\omega=1$) and (b) with an Allee effect ($\\omega=1.2$). Each line indicates a different disturbance mortality rate. The color of each point is the fraction of runs where the end population size was non-zero, a measure of persistence. These simulations are with the same model parameters as in Fig. 2.\\label{optimal-spacing-simple-model}'}
+```{r optimal-spacing-simple-model, echo=FALSE,eval=T,cache=TRUE,fig.height=6, error=FALSE,message=FALSE,warning=FALSE,fig.cap='Optimal spacing for different disturbance frequencies and mortality rates. Optimal spacing for the Beverton-Holt model (a) without ($\\omega=1$) and (b) with an Allee effect ($\\omega=1.2$). Each line indicates a different disturbance mortality rate. These simulations are with the same model parameters as in Fig. 2.\\label{optimal-spacing-simple-model}'}
 
 model_output <- read.csv(file='../model_outputs/two_patch_optimal_spacing_vs_disturbance_regime_NoAllee_Fig3a.csv',header=T)
 
@@ -209,7 +209,7 @@ require(viridis)
 require(gridExtra)
 p1 <- ggplot(data=model_output) +
    geom_ribbon(aes(x=disturbance_frequency,ymin=avg_optimal_spacing2.5,ymax=avg_optimal_spacing97.5 ,fill=as.factor(disturbance_mortality))) + scale_fill_viridis(discrete=T,alpha=0.1,guide=F) +
-   geom_line(aes(x=disturbance_frequency,y=avg_optimal_spacing,color=as.factor(disturbance_mortality)),size=1.5) + scale_color_viridis(discrete = T,alpha=0.5)   + theme_classic(base_size = 14, base_family = "")  + coord_cartesian(xlim = c(0, 0.4),ylim = c(0, 50)) + theme(plot.title = element_text(size = 12, face = "plain")) +
+   geom_line(aes(x=disturbance_frequency,y=avg_optimal_spacing,color=as.factor(disturbance_mortality)),size=1.5) + scale_color_viridis(discrete = T,alpha=0.5)   + theme_classic(base_size = 14, base_family = "")  + coord_cartesian(xlim = c(0, 0.5),ylim = c(0, 50)) + theme(plot.title = element_text(size = 12, face = "plain")) +
   labs(col='Disturbance mortality rate') +
   xlab(" ") +
   ylab(" ") +
@@ -217,7 +217,7 @@ p1 <- ggplot(data=model_output) +
   theme(legend.position="none") +
  # annotate("text",x=0.35,y=10,label='Small disturbance',col='black') +
  # annotate("text",x=0.25,y=50,label='Large disturbance',col='black')+
-  annotate("text",x=0.35,y=45,label='(a)',col='black')
+  annotate("text",x=0.48,y=48,label='(a)',col='black')
 
 
 ########## MODEL WITH ALLEE EFFECTS
@@ -235,7 +235,7 @@ require(viridis)
 require(gridExtra)
 p2 <- ggplot(data=model_output) +
    geom_ribbon(aes(x=disturbance_frequency,ymin=avg_optimal_spacing2.5,ymax=avg_optimal_spacing97.5 ,fill=as.factor(disturbance_mortality))) + scale_fill_viridis(discrete=T,alpha=0.1,guide=F) +
-   geom_line(aes(x=disturbance_frequency,y=avg_optimal_spacing,color=as.factor(disturbance_mortality)),size=1.5) + scale_color_viridis(discrete = T,alpha=0.5)   + theme_classic(base_size = 14, base_family = "")  + coord_cartesian(xlim = c(0, 0.4),ylim = c(0, 50)) + theme(plot.title = element_text(size = 12, face = "plain")) +
+   geom_line(aes(x=disturbance_frequency,y=avg_optimal_spacing,color=as.factor(disturbance_mortality)),size=1.5) + scale_color_viridis(discrete = T,alpha=0.5)   + theme_classic(base_size = 14, base_family = "")  + coord_cartesian(xlim = c(0, 0.5),ylim = c(0, 50)) + theme(plot.title = element_text(size = 12, face = "plain")) +
   labs(col='Disturbance mortality rate') +
   xlab(" ") +
   ylab(" ") +
@@ -243,7 +243,7 @@ p2 <- ggplot(data=model_output) +
   theme(legend.position="none") +
  # annotate("text",x=0.35,y=10,label='Small disturbance',col='black') +
  # annotate("text",x=0.25,y=50,label='Large disturbance',col='black')+
-  annotate("text",x=0.35,y=45,label='(b)',col='black')
+  annotate("text",x=0.48,y=48,label='(b)',col='black')
 
 
 library(ggpubr)
@@ -265,13 +265,15 @@ annotate_figure(figure,
 
 
 
-## Fig 4
+## Figure 4
 
 ```{r gamma_vs_delta2_code, echo=FALSE,eval=F,cache=TRUE, error=FALSE,message=FALSE,warning=FALSE,fig.cap='The optimal spacing between reserves for population persistence given different combinations of successful dispersal probability (to a patch 50 units away) and the probability that a disturbance in one patch affects the nearby second patch (at a distance of 50 units away). Simulations here are for a two-patch model (a) without and (b) with an Allee effect and the same parameter values as in figure 2.\\label{gamma_vs_delta}'}
 
 
 # Parameters
 source('../scripts/two_patch/parameter_values_two_patch.R')
+source('../scripts/two_patch/parameter_values_two_patch.R')
+source('../scripts/two_patch/simulate_model.R')
 
 prob_vector = rep(seq(0.001,1,by=0.05),5)
 #(-1/50)*log(prob_vector)
@@ -293,7 +295,7 @@ for (param_trial in 1:nrow(params_to_try)){
   optimal_spacing_output = find_optimal_spacing(r1,K1,params_to_try[param_trial,2],epsilon,omega,0.1, 0.25, params_to_try[param_trial,1],objective='persistence')
   optimal_spacing[param_trial]=optimal_spacing_output[1]
   mean_pop_size[param_trial]=optimal_spacing_output[2]
-  print(param_trial)
+  #print(param_trial)
 }
 
 myoutput <- data.frame(params_to_try,optimal_spacing,mean_pop_size)
@@ -306,10 +308,13 @@ write.csv(myoutput,file='../model_outputs/two_patch_optimal_spacing_for_dispersa
 ```
 
 
-```{r gamma_vs_delta2, echo=FALSE,eval=T,cache=TRUE, error=FALSE,message=FALSE,warning=FALSE,fig.cap='The optimal spacing between reserves for population persistence given different combinations of successful dispersal probability (to a patch 50 units away) and the probability that a disturbance in one patch affects the nearby second patch (at a distance of 50 units away). Simulations here are for a two-patch model (a) without and (b) with an Allee effect and the same parameter values as in figure 2.\\label{gamma_vs_delta}'}
+```{r gamma_vs_delta2, echo=FALSE,eval=T, error=FALSE,message=FALSE,warning=FALSE,fig.cap='The optimal spacing between reserves for population persistence given different combinations of successful dispersal probability (to a patch 50 units away) and the probability that a disturbance in one patch affects the nearby second patch (at a distance of 50 units away). Simulations here are for a two-patch model (a) without and (b) with an Allee effect and the same parameter values as in figure 2.\\label{gamma_vs_delta}'}
 
 model_output <- read.csv(file='../model_outputs/two_patch_optimal_spacing_for_dispersal_vs_disturbance_Fig4.csv',header=T)
 
+require(dplyr)
+require(ggplot2)
+require(viridis)
 model_output  <- model_output %>%
   dplyr::group_by(gamma,delta) %>%
   dplyr::summarise(avg_optimal_spacing = mean(optimal_spacing))
@@ -342,7 +347,7 @@ library(ggpubr)
 
 ## Figure 5
 
-```{r different_objectives_code, echo=FALSE,eval=F,cache=TRUE,error=FALSE,message=FALSE,warning=FALSE}
+```{r different_objectives_code, echo=FALSE,eval=F,error=FALSE,message=FALSE,warning=FALSE}
 
 #ptm <- proc.time()
 
@@ -365,15 +370,15 @@ num_trials = 100
 
 fishing_values_vec = 1#c(0.5,0.75,1)#seq(0.3,0.9,by=0.25)
 r_value_vec = 3#seq(2.5,3,by=1)
-omega_value_vec = 1.2#seq(1.2,1.4,by=0.2)
+omega_value_vec = c(1.0,1.2)#seq(1.2,1.4,by=0.2)
 dispersal_value_vec = c(0.7)#seq(0.1,1,by=0.1)
 K = 1
 
-disturbance_prob_vec = 0.01#seq(0,0.03,0.001)
+disturbance_prob_vec = seq(0,0.03,0.001)
 disturbance_size_vec = c(2)
 disturbance_magnitude_vec = 0.9#seq(0.7,0.9,0.2)
 
-objective_vec = c('persistence')#,'fishing')#,'population_size')
+objective_vec = c('persistence','fishing')#,'population_size')
 
 params_list <- expand.grid(fishing_values_vec,r_value_vec,omega_value_vec,dispersal_value_vec,disturbance_prob_vec,disturbance_size_vec,disturbance_magnitude_vec,objective_vec)
 params_list <- params_list[rep(seq(nrow(params_list)), each = 100), ]
@@ -403,21 +408,41 @@ for (param_index in 1:nrow(params_list)){
   
  # Run code for one combination of parameters and return optimal configuration... 
   source('../scripts/n_patch/run_code_for_N_patch_model.R')
-  params_list$optimal_spacing[param_index] <- mean(diff(optimal_reserves)-1)
-  params_list$mean_objective_value[param_index] <- -ranked_configs[1,1+num_reserves]
-  optimal_reserves_mat[param_index,] <- optimal_reserves
+  if (length(num_near_top)==1){
+    params_list$optimal_spacing[param_index] <- mean(diff(optimal_reserves)-1)
+    params_list$mean_objective_value[param_index] <- -ranked_configs[1,1+num_reserves]
+    optimal_reserves_mat[param_index,] <- optimal_reserves
+  }else{
+    # Situation where multiple configs can work
+    top_configs=ranked_configs[num_near_top,1:num_reserves]
+    #spacing <- apply(top_configs,1,FUN=diff) -1
+    params_list$optimal_spacing[param_index] <- min(colMeans(apply(top_configs,1,FUN=diff) -1))
+    params_list$mean_objective_value[param_index] <- -mean(ranked_configs[num_near_top,1+num_reserves])
+    optimal_reserves_mat[param_index,] <- NA
+  }
   
   print(paste(param_index,':',params_list$optimal_spacing[param_index],sep = ''))
   #print(head(ranked_configs))
+  
+  write.csv(params_list,file='../model_outputs/n_patch_optimal_spacing_vs_disturbance_regime_different_objectives_Fig5_temp.csv',quote = F)
 }
 
-write.csv(params_list,file='../model_outputs/n_patch_optimal_spacing_vs_disturbance_regime_different_objectives_Fig5.csv',quote = F)
+
+
+
+#write.csv(params_list,file='../model_outputs/n_patch_optimal_spacing_vs_disturbance_regime_different_objectives_Fig5.csv',quote = F)
 ```
 
-```{r different_objectives, echo=FALSE,eval=T,cache=TRUE,error=FALSE,message=FALSE,warning=FALSE,fig.cap='Optimal spacing between reserves (in an $n$-patch model) versus the probability of disturbance for three different objective functions. The parameter values used are: $\\delta$ = 0.7, $\\omega$ = 1.2, r = 3, and $\\mu$ = 0.9.\\label{different_objectives}'}
+```{r different_objectives, echo=FALSE,eval=T,error=FALSE,message=FALSE,warning=FALSE,fig.cap='Optimal spacing between reserves (in an $n$-patch model) versus the probability of disturbance for three different objective functions. The parameter values used are: $\\delta$ = 0.7, $\\omega$ = 1.2, r = 3, and $\\mu$ = 0.9.\\label{different_objectives}'}
 
-params_list <- read.csv(file='../model_outputs/n_patch_optimal_spacing_vs_disturbance_regime_different_objectives_Fig5.csv',header=T)
-#params_list$optimal_spacing <- params_list$optimal_spacing-1
+params_list <- read.csv(file='../model_outputs/n_patch_optimal_spacing_vs_disturbance_regime_different_objectives_Fig5_temp.csv',header=T)
+
+# For tie-breaking, use shorter distance
+#params_list$optimal_spacing[is.na(params_list$optimal_spacing)] = 0 
+
+# Only examine omega = 1 (no Allee effect) as a reference to figure in the main manuscript.
+params_list <- params_list %>%
+  filter(omega_value_vec == 1.2)
 
 # Build plot
 # require(ggplot2)
@@ -474,7 +499,7 @@ source('../scripts/n_patch/evalFunc.R')
 source('../scripts/n_patch/simulate_model_N_patches.R')
 
 # Parameter values
-num_patches=12 #15
+num_patches=20 #15
 #fraction_reserves = 0.05 # Optional code to use fraction of coastline instead of number of reserves
 num_reserves = 3#floor(fraction_reserves*num_patches)
 extra_patches=10
@@ -484,13 +509,13 @@ max_time= 100
 num_trials = 100
 
 
-fishing_values_vec = c(1)#,0.75,0.5)#seq(0.3,0.9,by=0.25)
+fishing_values_vec = rep(c(1,0.75,0.5),100)#seq(0.3,0.9,by=0.25)
 r_value_vec = 3#seq(2.5,3,by=1)
 omega_value_vec = 1.2#seq(1.2,1.4,by=0.2)
 dispersal_value_vec = c(0.7)#seq(0.1,1,by=0.1)
 K = 1
 
-disturbance_prob_vec = seq(0,0.02,0.005)#0.0005)
+disturbance_prob_vec = seq(0,0.03,0.0025)#0.0005)
 disturbance_size_vec = c(2)
 disturbance_magnitude_vec = 0.9#seq(0.7,0.9,0.2)
 
@@ -541,7 +566,8 @@ write.csv(params_list,file='../model_outputs/n_patch_optimal_spacing_vs_disturba
 ```{r fishing_objective,echo=FALSE,eval=T,cache=TRUE,error=FALSE,message=FALSE,warning=FALSE,fig.cap='Optimal spacing between reserves (in an $n$-patch model) to maximize persistence for different disturbance frequencies and fishing levels outside of reserves (fraction of population harvested in each patch). The parameter values used here are: $\\delta$ = 0.7, $\\omega$ = 1.2, r = 3, and $\\mu$ = 0.9. \\label{fishing_objective}'}
 
 params_list <- read.csv(file='../model_outputs/n_patch_optimal_spacing_vs_disturbance_regime_different_fishing_levels_Fig6.csv',header=T)
-#params_list$optimal_spacing <- params_list$optimal_spacing-1
+
+params_list$optimal_spacing[is.na(params_list$optimal_spacing)]=0
 
 ## New figure with error bars
 require(dplyr)
@@ -571,11 +597,11 @@ ggplot(data=params_list) +
 
 
 
-
+\pagebreak
 
 ## Figure 7
 
-```{r reserve_config_code, echo=FALSE,eval=F,cache=TRUE,error=FALSE,message=FALSE,warning=FALSE}
+```{r reserve_config_code, echo=FALSE,eval=F,error=FALSE,message=FALSE,warning=FALSE}
 
 # For reserve configuration, I should ensure there are no ties between configs. Otherwise the ranking of configs won't be accurate...
 
@@ -611,7 +637,7 @@ disturbance_magnitude_vec = 0.9#seq(0.7,0.9,0.2)
 objective_vec = c('persistence')#,'population_size')
 
 params_list <- expand.grid(fishing_values_vec,r_value_vec,omega_value_vec,dispersal_value_vec,disturbance_prob_vec,disturbance_size_vec,disturbance_magnitude_vec,objective_vec)
-params_list <- params_list[rep(seq(nrow(params_list)), each = 20), ]
+params_list <- params_list[rep(seq(nrow(params_list)), each = 100), ]
 names(params_list) <- c('fishing_values_vec','r_value_vec','omega_value_vec','dispersal_value_vec','disturbance_prob_vec','disturbance_size_vec','disturbance_magnitude_vec','objective_vec')
 
 params_list$optimal_spacing = 0 
@@ -646,25 +672,58 @@ for (param_index in 1:nrow(params_list)){
   #print(head(ranked_configs))
 }
 
-write.csv(optimal_reserves_mat,file='../model_outputs/n_patch_optimal_reserve_config_Fig7.csv',quote = F,row.names = F)
+#write.csv(optimal_reserves_mat,file='../model_outputs/n_patch_optimal_reserve_config_Fig7.csv',quote = F,row.names = F)
 ```
 
-```{r reserve_config, echo=FALSE,eval=T,cache=TRUE,error=FALSE,message=FALSE,warning=FALSE,fig.cap='Reserve locations for 20 different simulations all using the same parameter values. These are the same parameters as Fig. 5 with a set probability of disturbance of 0.01 (a value on Fig. 5 with a lot of variability) and for the persistence objective. Each R denotes the optimal placement of a reserve for each simulation. The density plot to the right denotes the frequency of locations chosen across all simulations.\\label{reserve_config}'}
+```{r reserve_config, echo=FALSE,eval=T,error=FALSE,message=FALSE,warning=FALSE,fig.cap='(a) Reserve locations for 20 different simulations all using the same parameter values. These are the same parameters as Fig. 5 with a set probability of disturbance of 0.01 (a value on Fig. 5 with high variability in optimal spacing) and for the persistence objective. Each R denotes the optimal placement of a reserve for each simulation. (b) Density plot of reserve locations chosen across 100 simulations. (c) Percent of simulations for each reserve configuration. Note that the middle reserve is always centered at 20, which reduces computational time.\\label{reserve_config}'}
 
 optimal_reserves_mat <- read.csv(file='../model_outputs/n_patch_optimal_reserve_config_Fig7.csv',header=T)
 
-layout(matrix(c(1,1,1,1,2,2), nrow = 1, ncol = 6, byrow = TRUE))
+layout(matrix(c(1,1,1,1,2,2,3,3,3,3,3,3), nrow = 2, ncol = 6, byrow = TRUE))
 par(mar=c(0.5,0.5,0.5,0.5),oma=c(4,4,0,0))
-matplot(optimal_reserves_mat,pch='R',cex=1,ylab='Reserve location',xlab='Simulation number',ylim=c(12.5,28.5),xlim=c(0.5,20.5),col='black',las=1)
+matplot(optimal_reserves_mat[1:20,],pch='R',cex=1,ylab='Reserve location',xlab='Simulation number',ylim=c(12.5,28.5),xlim=c(0.5,20.5),col='black',las=1)
 abline(h=seq(12.5,28.5,1),col='grey')
 abline(v=seq(0.5,20.5,1),col='grey')
 mtext('Location',side = 2,outer=F,line=3,cex=1.4)
 mtext('Simulation number',side = 1,outer=F,line=3,cex=1.4)
 
-my_dens <- density(as.vector(as.matrix(optimal_reserves_mat)))
+mtext(text='(a)',side = 3,line = -1,adj = -0.1)
+
+my_dens <- density(as.vector(as.matrix(optimal_reserves_mat)),na.rm=T)
 plot(my_dens$y,my_dens$x,main='',ylab='',xlab='',xaxt='n',yaxt='n',type='l',ylim=c(12.5,28.5),frame.plot = F)
 
+mtext(text='(b)',side = 3,line = -1,adj = 0.8)
+
 #grid(nx = diff(c(13,28)), ny = nrow(optimal_reserves_mat), col = "lightgray", lty = "dotted",lwd = par("lwd"), equilogs = TRUE)
+
+## BUILD A HISTOGRAM OR TABLE OF RESULTS ###
+
+spacing <- apply(optimal_reserves_mat,1,FUN=diff) -1
+
+df <- as.data.frame(t(spacing)) %>%
+  mutate(user_A2 = pmin(V2, V3),
+         V3 = pmax(V2, V3),
+         V2 = user_A2) %>%
+  select(-user_A2) %>%
+  group_by(V2, V3) %>%
+  summarise(sum = n()/100) %>%
+  mutate(avg_spacing = (V3+V2)/2) %>%
+  arrange(desc(sum)) %>%
+  select(V2,V3,avg_spacing,sum) %>%
+  na.omit()
+
+names(df) <- c('Spacing 1','Spacing 2','Average spacing','Proportion of sims')
+
+library(plotrix)
+plot.new()
+addtable2plot(0.01,0,df, 
+              xpad=0, ypad=0.4,
+              bty='o',
+              display.rownames = FALSE, 
+              display.colnames = TRUE,
+              hlines = TRUE,
+              vlines = TRUE)
+mtext(text='(c)',side = 3,line = -6,adj = 0)
 ```
 
 
