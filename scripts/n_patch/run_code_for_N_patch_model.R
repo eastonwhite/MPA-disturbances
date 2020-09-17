@@ -26,14 +26,14 @@ for (index1 in 1:nrow(configs_to_try)){
   num_near_top = which(ranked_configs[,(num_reserves+1)] <= ranked_configs[1,(num_reserves+1)]-0.001*ranked_configs[1,(num_reserves+1)])
   
   
-  # if (length(num_near_top)>20){
-  #   optimal_reserves=rep(NA,num_reserves)
-  #   #optimal_spacing[value] = NA
-  #   #print(optimal_spacing[value])
-  # }else{
+  # Check to ensure optimal spacing works
+    #dude=ranked_configs[num_near_top,1:num_reserves]
+    #spacing <- apply(dude,1,FUN=diff) -1
+    #print(min(colMeans(spacing)))
+  # End chunk 
 
   #print(ranked_configs[1:5,])
-    if (is.na(ranked_configs[1,1+num_reserves]) | ranked_configs[1,1+num_reserves] == -num_trials){
+    if (is.na(ranked_configs[1,1+num_reserves]) | ranked_configs[1,1+num_reserves] == 0){
       ranked_configs = matrix(NA,nrow=nrow(ranked_configs),ncol=ncol(ranked_configs))
     }
     optimal_reserves= ranked_configs[1,1:num_reserves]

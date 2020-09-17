@@ -3,7 +3,7 @@
 
 # Default parameters for two patch model
 
-r1               = 2
+r1               = 3
 K1               = 1
 delta            = 0.01
 epsilon          = 0.5 #Default 0.5

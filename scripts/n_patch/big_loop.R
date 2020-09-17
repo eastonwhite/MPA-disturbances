@@ -14,18 +14,18 @@ extra_patches=10
 total_patches=num_patches+2*extra_patches
 
 max_time= 100
-num_trials = 300
+num_trials = 100
 
 
 fishing_values_vec = 1#c(0.5,0.75,1)#seq(0.3,0.9,by=0.25)
-r_value_vec = 2.3#seq(2.5,3,by=1)
+r_value_vec = 3#2.2#seq(2.5,3,by=1)
 omega_value_vec = 1.2#seq(1.2,1.4,by=0.2)
 dispersal_value_vec = c(0.7)#seq(0.02,1,by=0.3)
 K = 1
 
-disturbance_prob_vec = 0#seq(0,0.015,0.001)
+disturbance_prob_vec = seq(0,0.03,0.005)#seq(0,0.015,0.005)
 disturbance_size_vec = 2#c(1,2)
-disturbance_magnitude_vec = c(0.9)#seq(0.7,0.9,0.2)
+disturbance_magnitude_vec = c(0.95)#seq(0.7,0.9,0.2)
 
 objective_vec = c('persistence')#,'fishing','population_size')
 
